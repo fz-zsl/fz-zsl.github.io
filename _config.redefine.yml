@@ -198,7 +198,7 @@ navbar:
       path: / 
       icon: fa-regular fa-house # can be empty
     About:
-      path: /2024/10/28/about
+      path: /about
       icon: fa-regular fa-circle-user
     Research:
       icon: fa-regular fa-paper-plane
