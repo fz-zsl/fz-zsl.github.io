@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* 页面主体样式 */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 容器样式 */
+        .container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+
+        /* 副标题样式 */
+        p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Coming Soon</h1>
+        <p>We're working hard to bring you something amazing</p>
+    </div>
+</body>
+</html>
