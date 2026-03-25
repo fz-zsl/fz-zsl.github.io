@@ -190,12 +190,7 @@
             </div>
 
             <div class="bg-white rounded-xl p-4 card-shadow">
-                <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/images/quatrope/exclude.png"
-                      alt="Excluded Cases" class="w-full h-auto rounded-lg"
-                >
+                <img src="/images/quatrope/exclude.png" alt="Excluded Cases" class="w-1/1 h-auto rounded-lg not-lazy" loading="eager">
                 <p class="text-center text-sm text-gray mt-3">Figure 2: Examples of questions that will be excluded when filtering on the ScanQA dataset.</p>
                 <p class="text-left text-sm text-gray mt-3">① The question "What is the object surrounding the table?" should be excluded as there are multiple correct answers.</p>
                 <p class="text-left text-sm text-gray mt-3">② The question "What is the grey object next to the table under the TV?" should be excluded as the question tells that the target object is grey and the model can simply identify the target object by color without spatial reasoning.</p>
