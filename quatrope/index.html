@@ -413,7 +413,7 @@
                     <button id="copyBibtex" class="absolute top-2 right-2 px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-1">
                         <i class="fas fa-copy"></i> Copy
                     </button>
-                    <pre class="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm font-mono"><code>@misc{zhou2026scalableobjectrelationencoding,
+                    <pre id="bibtexContent" class="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm font-mono"><code>@misc{zhou2026scalableobjectrelationencoding,
       title={Scalable Object Relation Encoding for Better 3D Spatial Reasoning in Large Language Models}, 
       author={Shengli Zhou and Minghang Zheng and Feng Zheng and Yang Liu},
       year={2026},
@@ -426,6 +426,33 @@
             </div>
         </div>
     </section>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.getElementById('copyBibtex');
+        const bibtexText = document.getElementById('bibtexContent');
+        
+        copyBtn.addEventListener('click', async function() {
+            try {
+                await navigator.clipboard.writeText(bibtexText.textContent);
+                
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied';
+                copyBtn.classList.add('bg-green-500');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('bg-green-500');
+                }, 2000);
+            } catch (err) {
+                copyBtn.innerHTML = '<i class="fas fa-times"></i> Failed';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                }, 2000);
+            }
+        });
+    });
+    </script>
 
     <!-- Footer -->
     <footer class="bg-secondary text-white py-8">
