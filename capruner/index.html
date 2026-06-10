@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPruner: Conceptual-Adjacent Scene Graph Pruner for Enhancing 3D Spatial Reasoning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#333647',
+                        light: '#F5F7FA',
+                        gray: '#6B7280'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Georgia', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .section-padding {
+                @apply py-16 md:py-24;
+            }
+            .card-shadow {
+                @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+        }
+    </style>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white font-sans text-secondary">
+    <!-- Navbar -->
+    <nav class="sticky top-0 bg-white/90 backdrop-blur-sm shadow-sm z-50">
+        <div class="container mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-primary">CAPruner</a>
+            <div class="flex gap-6">
+                <a href="#overview" class="font-medium hover:text-primary transition-colors">Overview</a>
+                <a href="#method" class="font-medium hover:text-primary transition-colors">Method</a>
+                <a href="#results" class="font-medium hover:text-primary transition-colors">Results</a>
+                <a href="#code" class="font-medium hover:text-primary transition-colors">Code</a>
+                <a href="#citation" class="font-medium hover:text-primary transition-colors">Citation</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-light section-padding">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 text-balance">
+                CAPruner: Conceptual-Adjacent Scene Graph Pruner for Enhancing 3D Spatial Reasoning of Large Language Models
+            </h1>
+            <div class="flex flex-wrap justify-center gap-4 md:gap-6 text-sm md:text-base text-gray mb-6">
+                <span>Shengli Zhou<sup>1</sup></span>
+                <span>Xiangchen Wang<sup>1</sup></span>
+                <span>Guanhua Chen<sup>1 ✉️</sup></span>
+                <span>Feng Zheng<sup>1 ✉️</sup></span>
+            </div>
+            <div class="flex flex-wrap justify-center gap-3 text-sm text-gray mb-8">
+                <span><sup>1</sup>Southern University of Science and Technology</span>
+            </div>
+            <div class="flex justify-center gap-4 mb-8">
+                <a href="https://github.com/fz-zsl/CAPruner" target="_blank" class="flex items-center gap-2 px-6 py-3 bg-white border border-gray rounded-lg font-medium hover:bg-light transition-colors">
+                    <i class="fab fa-github"></i> GitHub Code
+                </a>
+                <a href="https://arxiv.org/abs/2606.07529" target="_blank" class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                    <i class="fas fa-file-pdf"></i> Paper PDF
+                </a>
+                <a href="/capruner/slides.pdf" target="_blank" class="flex items-center gap-2 px-6 py-3 bg-white border border-gray rounded-lg font-medium hover:bg-light transition-colors">
+                    <i class="fas fa-file-pdf"></i> Slides PDF
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section-padding">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 border-b border-gray/20 pb-2">Overview</h2>
+            <p class="text-lg leading-relaxed mb-4">
+                Large language models (LLMs) have recently been applied to 3D vision-language (3D-VL) tasks, which require spatial reasoning to identify target objects relative to anchors. Scene graphs are commonly employed to represent such relations, but reasoning over complete graphs incurs high token costs and computational inefficiencies, motivating the need for pruning. Existing pruning methods primarily rely on spatial proximity and often remove task-relevant relations, thereby undermining reliable spatial reasoning.
+            </p>
+            <p class="text-lg leading-relaxed mb-4">
+                To address these limitations, we derive a key requirement for scene graph pruning: preserving spatial relations that are most pertinent to the specific 3D-VL task. Guided by this insight, we propose the <strong>Conceptual-Adjacent Scene Graph Pruner (CAPruner)</strong>. CAPruner integrates fuzzy semantic relevance with spatial proximity to estimate the importance of relations, enabling the selection of critical relations in a task-specific context.
+            </p>
+            <p class="text-lg leading-relaxed">
+                Moreover, to avoid costly relation-level annotations, CAPruner is trained by supervising the aggregated scores of each node's incident edges. Extensive experiments demonstrate that CAPruner effectively preserves relations essential for spatial reasoning, leading to substantial performance improvements of LLMs on 3D-VL tasks.
+            </p>
+        </div>
+    </section>
+
+    <!-- Method Section -->
+    <section id="method" class="bg-light section-padding">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 border-b border-gray/20 pb-2">Method Overview</h2>
+            
+            <div class="bg-white rounded-xl p-6 card-shadow mb-8 gap-8">
+                <h3 class="text-xl font-semibold mb-4 text-primary">Core Idea</h3>
+                <p class="text-lg">
+                    Estimate the importance of spatial relations and choose a set of relations with O(n) size that contains all key spatial relations that are used for spatial reasoning.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 card-shadow mb-8 gap-8">
+                <img src="/images/capruner/capruner.png" alt="CAPruner" class="w-1/1 h-auto rounded-lg">
+                <p class="text-center text-sm text-gray mt-3">Figure 1: The model architecture of CAPruner.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-primary">CAPruner</h3>
+                    <ul class="space-y-3 leading-relaxed">
+                        <li class="flex gap-2">
+                            <i class="fas fa-check-circle text-primary mt-1"></i>
+                            Estimates object-query semantic relevance via fuzzy matching on object categories.
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fas fa-check-circle text-primary mt-1"></i>
+                            Combines semantic cues with geometric spatial proximity to predict edge weights.
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fas fa-check-circle text-primary mt-1"></i>
+                            Adaptively prioritizes query-relevant spatial relations.
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fas fa-check-circle text-primary mt-1"></i>
+                            Achieves high token efficiency (34% reduction in token usage).
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-primary">Node-wise Supervision</h3>
+                    <div class="mb-5">
+                        <ul class="space-y-2 leading-relaxed text-sm md:text-base">
+                            <li class="flex gap-2">
+                                <i class="fas fa-check-circle text-primary mt-1"></i>
+                                Employs p-norm aggregation to aggregate edge weights into node weights.
+                            </li>
+                            <li class="flex gap-2">
+                                <i class="fas fa-check-circle text-primary mt-1"></i>
+                                Supervises node weights using only available target object labels, avoiding costly relation-level annotations.
+                            </li>
+                            <li class="flex gap-2">
+                                <i class="fas fa-check-circle text-primary mt-1"></i>
+                                Utilizes a Weighted MSE loss to balance the contributions of target and non-target objects.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experimental Results -->
+    <section id="results" class="section-padding">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 border-b border-gray/20 pb-2">Experimental Results</h2>
+            <p class="text-lg mb-8">
+                We compare CAPruner with strong 3D LLM baselines across 3D VG (ScanRefer) and 3D VQA (ScanQA, SQA3D) benchmarks. All results show consistent and substantial gains from CAPruner compared to the proximity-based KNN pruning strategy (3DGraphLLM).
+            </p>
+
+            <div class="mb-10 bg-white rounded-xl p-6 card-shadow">
+                <h3 class="text-xl font-semibold mb-4 text-primary">Main Benchmark Results</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse table-sm-text">
+                        <thead>
+                            <tr class="bg-light">
+                                <th class="border border-gray/20 p-2 text-left">Model</th>
+                                <th class="border border-gray/20 p-2 text-center">ScanRefer A.@0.25</th>
+                                <th class="border border-gray/20 p-2 text-center">ScanRefer A.@0.5</th>
+                                <th class="border border-gray/20 p-2 text-center">ScanQA B-4</th>
+                                <th class="border border-gray/20 p-2 text-center">SQA3D EM@1</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="hover:bg-light/50">
+                                <td class="border border-gray/20 p-2">3DGraphLLM-1B</td>
+                                <td class="border border-gray/20 p-2 text-center">52.5</td>
+                                <td class="border border-gray/20 p-2 text-center">47.5</td>
+                                <!-- <td class="border border-gray/20 p-2 text-center">45.0</td>
+                                <td class="border border-gray/20 p-2 text-center">40.5</td> -->
+                                <td class="border border-gray/20 p-2 text-center">12.2</td>
+                                <td class="border border-gray/20 p-2 text-center">52.6</td>
+                            </tr>
+                            <tr class="hover:bg-light/50 bg-primary/5">
+                                <td class="border border-gray/20 p-2 font-medium">CAPruner + Llama-3.2-1B</td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>55.0</strong></td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>49.6</strong></td>
+                                <!-- <td class="border border-gray/20 p-2 text-center font-medium"><strong>48.0</strong></td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>42.8</strong></td> -->
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>13.0</strong></td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>52.8</strong></td>
+                            </tr>
+                            <tr class="hover:bg-light/50">
+                                <td class="border border-gray/20 p-2">3DGraphLLM-8B</td>
+                                <td class="border border-gray/20 p-2 text-center">60.2</td>
+                                <td class="border border-gray/20 p-2 text-center">54.6</td>
+                                <!-- <td class="border border-gray/20 p-2 text-center">54.7</td>
+                                <td class="border border-gray/20 p-2 text-center">49.4</td> -->
+                                <td class="border border-gray/20 p-2 text-center">12.5</td>
+                                <td class="border border-gray/20 p-2 text-center">55.2</td>
+                            </tr>
+                            <tr class="hover:bg-light/50 bg-primary/5">
+                                <td class="border border-gray/20 p-2 font-medium">CAPruner + Llama-3-8B</td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>61.7</strong></td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>56.0</strong></td>
+                                <!-- <td class="border border-gray/20 p-2 text-center font-medium"><strong>55.3</strong></td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>49.9</strong></td> -->
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>13.2</strong></td>
+                                <td class="border border-gray/20 p-2 text-center font-medium"><strong>56.3</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code & Resources -->
+    <section id="code" class="bg-light section-padding">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl text-center">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 border-b border-gray/20 pb-2 inline-block">Code & Resources</h2>
+            <div class="bg-white rounded-xl p-8 card-shadow inline-block">
+                <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
+                    <a href="https://github.com/fz-zsl/CAPruner" target="_blank" class="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors text-lg">
+                        <i class="fab fa-github fa-2x"></i>
+                        <span>GitHub Repository</span>
+                    </a>
+                    <a href="https://arxiv.org/abs/2606.07529" target="_blank" class="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white border border-gray rounded-lg font-medium hover:bg-light transition-colors text-lg">
+                        <i class="fas fa-file-pdf fa-2x"></i>
+                        <span>Paper (PDF)</span>
+                    </a>
+                </div>
+                <div class="text-left text-gray space-y-2">
+                    <p><i class="fas fa-check mr-2"></i> CAPruner implementation code</p>
+                    <p><i class="fas fa-check mr-2"></i> Pre-trained model checkpoints</p>
+                    <p><i class="fas fa-check mr-2"></i> Replication scripts for experiments</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="citation" class="section-padding">
+        <div class="container mx-auto px-4 md:px-8 max-w-4xl">
+            <h2 class="text-2xl md:text-3xl font-bold mb-8 border-b border-gray/20 pb-2">Citation</h2>
+            <div class="bg-white rounded-xl p-6 card-shadow">
+                <p class="mb-4 text-lg">If you find our work useful in your research, please cite:</p>
+                <div class="relative">
+                    <button id="copyBibtex" class="absolute top-2 right-2 px-3 py-1 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-1">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <pre id="bibtexContent" class="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm font-mono"><code>@misc{zhou2026caprunerconceptualadjacentscenegraph,
+      title={CAPruner: Conceptual-Adjacent Scene Graph Pruner for Enhancing 3D Spatial Reasoning of Large Language Models}, 
+      author={Shengli Zhou and Xiangchen Wang and Guanhua Chen and Feng Zheng},
+      year={2026},
+      eprint={2606.07529},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2606.07529}, 
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.getElementById('copyBibtex');
+        const bibtexText = document.getElementById('bibtexContent');
+        
+        copyBtn.addEventListener('click', async function() {
+            try {
+                await navigator.clipboard.writeText(bibtexText.textContent);
+                
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied';
+                copyBtn.classList.add('bg-green-500');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('bg-green-500');
+                }, 2000);
+            } catch (err) {
+                copyBtn.innerHTML = '<i class="fas fa-times"></i> Failed';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                }, 2000);
+            }
+        });
+    });
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-secondary text-white py-8">
+        <div class="container mx-auto px-4 md:px-8 text-center">
+            <p class="mb-2">CAPruner: Conceptual-Adjacent Scene Graph Pruner for Enhancing 3D Spatial Reasoning of Large Language Models</p>
+            <p class="text-gray-300 text-sm">ACL 2026 Main Conference | <a href="https://fz-zsl.github.io/capruner" class="text-primary hover:underline" target="_blank">fz-zsl.github.io/capruner</a></p>
+            <p class="text-gray-400 text-xs mt-4">© 2026 CAPruner Team. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Smooth Scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
